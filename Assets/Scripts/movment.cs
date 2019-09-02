@@ -4,13 +4,26 @@ using UnityEngine;
 
 public class movment : MonoBehaviour
 {
+    public float jumpForce;
 	public float speed;
 	public Rigidbody rb;
+    public bool isJumping;
 	
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        isJumping = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.tag == "Balle")
+        {
+            other.transform.parent = transform;
+            other.transform.localPosition = GameObject.Find("Spawn").transform.localPosition;
+            Debug.Log("Touchée");
+        }
     }
 
     // Update is called once per frame
@@ -19,14 +32,24 @@ public class movment : MonoBehaviour
         float translationV = Input.GetAxis("Vertical") * speed * Time.deltaTime;
 		float translationH = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
 
-		
-		if (Input.GetKeyDown("space"))
+        if (transform.position.y <= 2f)
         {
-             rb.AddForce(transform.up * 200.0f);
+            isJumping = false;
         }
-		
-		transform.position += new Vector3(translationH,0,translationV);
-		
-		Debug.Log(Time.deltaTime);
+
+        if (Input.GetKeyDown("space") && isJumping == false)
+        {
+            rb.AddForce(transform.up * jumpForce);
+            isJumping = true;
+        }
+
+        //Debug.Log(Time.deltaTime);
+
+        if(translationV != 0 || translationH != 0)
+        {
+            transform.rotation = Quaternion.LookRotation(new Vector3(translationH, 0, translationV));
+            transform.position += new Vector3(translationH, 0, translationV);
+        }
+
     }
 }
