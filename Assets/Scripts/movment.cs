@@ -7,13 +7,17 @@ public class movment : MonoBehaviour
     public float jumpForce;
 	public float speed;
 	public Rigidbody rb;
+    public Animator animator;
     public bool isJumping;
+
 	
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         isJumping = false;
+        animator.SetTrigger("Land");
+        animator.SetBool("Grounded", true);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -24,6 +28,12 @@ public class movment : MonoBehaviour
             other.transform.localPosition = GameObject.Find("Spawn").transform.localPosition;
             Debug.Log("Touchée");
         }
+    }
+
+    public void Jump()
+    {
+        rb.AddForce(transform.up * jumpForce);
+        isJumping = true;
     }
 
     // Update is called once per frame
@@ -39,8 +49,10 @@ public class movment : MonoBehaviour
 
         if (Input.GetKeyDown("space") && isJumping == false)
         {
-            rb.AddForce(transform.up * jumpForce);
-            isJumping = true;
+            Jump();
+            /*animator.Play("jump-up");
+            animator.Play("jump-float");
+            animator.Play("jump-down");*/
         }
 
         //Debug.Log(Time.deltaTime);
@@ -49,6 +61,7 @@ public class movment : MonoBehaviour
         {
             transform.rotation = Quaternion.LookRotation(new Vector3(translationH, 0, translationV));
             transform.position += new Vector3(translationH, 0, translationV);
+            animator.SetFloat("MoveSpeed", (translationH + translationV)*10f);
         }
 
     }
